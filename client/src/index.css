@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+
+@theme {
+  --font-english: "Inter", sans-serif;
+  --font-tamil: "Hind Madurai", sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+@keyframes pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+@keyframes rise {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pop { animation: pop 0.5s ease-out forwards; }
+.animate-draw {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: draw 0.4s ease-out 0.35s forwards;
+}
+.animate-shrink { animation: shrink 5s linear forwards; }
+.animate-rise { animation: rise 0.5s ease-out 0.5s both; }
