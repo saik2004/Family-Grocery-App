@@ -2,6 +2,15 @@ import { useState, useEffect } from "react";
 import api from "../api";
 import ProductImage from "../Components/ProductImage";
 
+const SPARKS = [
+  { l: "12%", d: "0s", c: "bg-amber-400" },
+  { l: "28%", d: "0.5s", c: "bg-emerald-400" },
+  { l: "44%", d: "1.1s", c: "bg-lime-400" },
+  { l: "60%", d: "0.3s", c: "bg-amber-500" },
+  { l: "76%", d: "0.9s", c: "bg-emerald-500" },
+  { l: "90%", d: "1.5s", c: "bg-lime-500" },
+];
+
 const formatAdded = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
@@ -70,40 +79,71 @@ export default function DadView({ onReset }) {
   return (
     <div className="min-h-screen bg-[#F8FAF7] pb-8">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-emerald-900/10 bg-[#166534] px-4 pb-5 pt-5 text-white shadow-lg shadow-green-900/10 sm:px-6 sm:pt-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              அப்பா
-            </h1>
+      <header className="sticky top-0 z-10 overflow-hidden border-b border-emerald-900/40 bg-gradient-to-b from-[#16803d] to-[#166534] px-4 pb-4 pt-3.5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(22,101,52,0.2),0_8px_20px_-6px_rgba(22,101,52,0.45)] sm:px-6 sm:pb-5 sm:pt-4">
+        {/* Soft glow */}
+        <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
 
-            <p className="mt-1 text-sm font-medium text-emerald-100">
-              இன்றைய பட்டியல் (Today's list)
-            </p>
+        {/* Top row */}
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] ring-1 ring-white/25 sm:h-12 sm:w-12 sm:text-2xl">
+              👨
+            </span>
+            <div className="min-w-0 leading-tight">
+              <h1 className="truncate text-xl font-extrabold tracking-tight sm:text-2xl">
+                அப்பா
+              </h1>
+              <p className="truncate text-xs font-semibold text-emerald-100/90 sm:text-sm">
+                இன்றைய பட்டியல் · Today's list
+              </p>
+            </div>
           </div>
 
           <button
             onClick={onReset}
-            className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/20 active:scale-95 sm:text-sm"
+            aria-label="Change role"
+            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3.5 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_2px_rgba(0,0,0,0.15)] outline-none backdrop-blur transition hover:border-white/50 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-emerald-200 active:scale-95"
           >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13" />
+            </svg>
             மாற்று
           </button>
         </div>
 
         {/* Progress */}
         {total > 0 && (
-          <div className="mt-5">
-            <div className="mb-2 flex justify-between text-sm font-semibold">
-              <span className="text-emerald-50">
-                {bought.length} / {total} வாங்கியது
+          <div className="relative mt-4 rounded-2xl border border-white/15 bg-black/10 px-3.5 py-3 shadow-[inset_0_1px_2px_rgba(0,0,0,0.12)]">
+            <div className="mb-2 flex items-center justify-between text-sm font-semibold">
+              <span className="flex items-center gap-2 text-emerald-50">
+                <span className="flex h-6 min-w-6 items-center justify-center rounded-lg bg-white/15 px-1.5 text-xs font-extrabold ring-1 ring-white/20">
+                  {bought.length}/{total}
+                </span>
+                வாங்கியது
               </span>
-
-              <span className="text-white">{percent}%</span>
+              <span className="text-base font-extrabold tabular-nums">
+                {percent}%
+              </span>
             </div>
 
-            <div className="h-2.5 overflow-hidden rounded-full bg-green-950/40">
+            <div
+              role="progressbar"
+              aria-valuenow={percent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="h-2.5 overflow-hidden rounded-full bg-green-950/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"
+            >
               <div
-                className="h-full rounded-full bg-emerald-400 transition-all duration-500 ease-out"
+                className="relative h-full rounded-full bg-gradient-to-r from-emerald-300 to-emerald-400 shadow-[0_0_10px_rgba(110,231,183,0.7)] transition-all duration-500 ease-out"
                 style={{ width: `${percent}%` }}
               />
             </div>
@@ -135,71 +175,111 @@ export default function DadView({ onReset }) {
               </h2>
 
               {pending.length === 0 ? (
-                <div className="rounded-3xl border border-emerald-100 bg-white px-6 py-10 text-center shadow-sm">
-                  <div className="text-5xl">{total > 0 ? "🎉" : "📭"}</div>
+                total > 0 ? (
+                  <div className="animate-pop relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-b from-emerald-50 via-white to-amber-50 px-6 pb-8 pt-10 text-center shadow-[0_1px_2px_rgba(22,101,52,0.08),0_16px_32px_-16px_rgba(22,101,52,0.35)]">
+                    {SPARKS.map((s, i) => (
+                      <span
+                        key={i}
+                        className={`animate-float-up pointer-events-none absolute bottom-6 h-2 w-2 rounded-sm ${s.c}`}
+                        style={{ left: s.l, animationDelay: s.d }}
+                      />
+                    ))}
 
-                  <p className="mt-4 text-xl font-bold text-[#17231C]">
-                    {total > 0 ? "எல்லாம் வாங்கியாச்சு!" : "எதுவும் இல்லை"}
-                  </p>
+                    <div className="relative mx-auto flex h-24 w-24 items-center justify-center">
+                      <span className="absolute inset-0 rounded-full bg-amber-300/40 blur-xl" />
+                      <span className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-b from-amber-300 to-amber-500 text-5xl shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_12px_24px_-8px_rgba(180,83,9,0.55)] ring-4 ring-amber-100">
+                        <svg
+                          width="56"
+                          height="56"
+                          viewBox="0 0 64 64"
+                          fill="none"
+                          className="relative"
+                        >
+                          <path
+                            d="M16 33 L28 45 L48 21"
+                            stroke="white"
+                            strokeWidth="6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="animate-draw"
+                          />
+                        </svg>
+                      </span>
+                    </div>
 
-                  <p className="mt-1 text-sm text-slate-400">
-                    {total > 0 ? "All done" : "Nothing to buy yet"}
-                  </p>
-                </div>
+                    <p className="relative mt-5 text-2xl font-extrabold tracking-tight text-[#17231C]">
+                      எல்லாம் வாங்கியாச்சு!
+                    </p>
+                    <p className="relative mt-1 text-sm font-semibold text-emerald-700">
+                      All done · நன்றி அப்பா 👏
+                    </p>
+
+                    <div className="relative mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 shadow-sm">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#166534] text-xs text-white">
+                        ✓
+                      </span>
+                      {total} / {total} வாங்கியது
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white px-6 py-10 text-center">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 text-3xl ring-1 ring-slate-200">
+                      📭
+                    </div>
+                    <p className="mt-4 text-lg font-bold text-[#17231C]">
+                      எதுவும் இல்லை
+                    </p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      Nothing to buy yet · அம்மா அனுப்பியதும் இங்கே வரும்
+                    </p>
+                  </div>
+                )
               ) : (
                 <ul className="space-y-3 sm:space-y-4">
                   {pending.map((item) => (
                     <li key={item._id}>
                       <button
                         onClick={() => toggleItem(item._id)}
-                        className="group flex w-full items-center gap-3 rounded-2xl border border-amber-200 border-l-4 border-l-amber-500 bg-[#FFFBEB] p-3.5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-50 hover:shadow-md active:scale-[0.98] sm:gap-4 sm:rounded-3xl sm:p-5"
+                        className="group flex w-full items-center gap-2.5 rounded-xl border border-amber-200 border-l-4 border-l-amber-500 bg-[#FFFBEB] p-2 text-left shadow-[0_1px_2px_rgba(180,83,9,0.08)] outline-none transition-all duration-200 hover:bg-amber-50 focus-visible:ring-4 focus-visible:ring-amber-200 active:scale-[0.98] sm:gap-3 sm:p-2.5"
                       >
-                        {/* Product details */}
-                        <span className="flex min-w-0 flex-1 items-center gap-3">
-                          {/* Fixed square image, same size on every card */}
-                          <span className="block h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-blue-50 sm:h-20 sm:w-20">
-                            <ProductImage src={item.image} fill />
+                        {/* Image */}
+                        <span className="block h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-amber-900/10 sm:h-14 sm:w-14">
+                          <ProductImage src={item.image} fill />
+                        </span>
+
+                        {/* Text */}
+                        <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                          <span className="line-clamp-2 break-words text-base font-bold tracking-tight text-[#17231C] sm:text-lg">
+                            {item.nameTa}
                           </span>
-
-                          {/* Text column */}
-                          <span className="flex min-w-0 flex-1 flex-col justify-center">
-                            <span className="block truncate text-xl font-bold leading-snug tracking-tight text-[#17231C] sm:text-2xl">
-                              {item.nameTa}
-                            </span>
-
-                            {item.nameEn && item.nameEn !== item.nameTa && (
-                              <span className="block truncate text-xs font-medium text-slate-500 sm:text-sm">
-                                {item.nameEn}
-                              </span>
-                            )}
-
-                            <span className="mt-1 block text-xs font-medium text-amber-700">
+                          <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] font-medium text-amber-700">
+                            <span className="truncate">
                               🕒 {formatAdded(item.addedAt)}
                             </span>
+                            {isNew(item) && (
+                              <span className="shrink-0 rounded-full bg-amber-200 px-1.5 py-px text-[9px] font-bold text-amber-900 ring-1 ring-amber-300">
+                                புதியது
+                              </span>
+                            )}
                           </span>
                         </span>
 
-                        {/* Quantity */}
-                        <span className="flex h-[58px] min-w-[68px] shrink-0 flex-col items-center justify-center rounded-xl border border-amber-200 bg-amber-100 px-3 shadow-sm">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                        {/* Qty */}
+                        <span className="flex h-10 min-w-[48px] shrink-0 flex-col items-center justify-center rounded-lg border border-amber-200 bg-amber-100 px-1.5 leading-none">
+                          <span className="text-[8px] font-bold uppercase tracking-wider text-amber-700">
                             Qty
                           </span>
-                          <span className="mt-0.5 whitespace-nowrap text-lg font-extrabold leading-tight text-amber-900">
+                          <span className="mt-0.5 whitespace-nowrap text-sm font-extrabold text-amber-900">
                             {item.quantity}
                           </span>
                         </span>
 
-                        {/* New badge */}
-                        {isNew(item) && (
-                          <span className="shrink-0 rounded-full bg-amber-200 px-2 py-1 text-[10px] font-bold text-amber-900 ring-1 ring-amber-300 sm:text-xs">
-                            புதியது
-                          </span>
-                        )}
-
-                        {/* Bought action */}
-                        <span className="flex h-[58px] shrink-0 items-center justify-center gap-1.5 rounded-xl border border-amber-300 bg-white px-3 text-xs font-bold text-amber-800 shadow-sm transition-all duration-200 group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-active:scale-95 sm:px-4 sm:text-sm">
-                          வாங்கியது
-                          <span className="text-base">✓</span>
+                        {/* Bought tick */}
+                        <span
+                          aria-label="Mark as bought"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-white text-base font-bold text-amber-800 transition-all duration-200 group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-active:scale-90"
+                        >
+                          ✓
                         </span>
                       </button>
                     </li>

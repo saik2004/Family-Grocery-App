@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 @theme {
   --font-english: "Inter", sans-serif;
   --font-tamil: "Hind Madurai", sans-serif;
@@ -10,28 +9,97 @@ body {
   font-family: var(--font-sans);
 }
 
-@keyframes pop {
-  0% { transform: scale(0); opacity: 0; }
-  60% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+* {
+  scrollbar-width: none;
 }
-@keyframes draw {
-  to { stroke-dashoffset: 0; }
-}
-@keyframes shrink {
-  from { width: 100%; }
-  to { width: 0%; }
-}
-@keyframes rise {
-  from { transform: translateY(16px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+*::-webkit-scrollbar {
+  display: none;
 }
 
-.animate-pop { animation: pop 0.5s ease-out forwards; }
+@keyframes pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+@keyframes rise {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-pop {
+  animation: pop 0.5s ease-out forwards;
+}
 .animate-draw {
   stroke-dasharray: 50;
   stroke-dashoffset: 50;
   animation: draw 0.4s ease-out 0.35s forwards;
 }
-.animate-shrink { animation: shrink 5s linear forwards; }
-.animate-rise { animation: rise 0.5s ease-out 0.5s both; }
+.animate-shrink {
+  animation: shrink 5s linear forwards;
+}
+.animate-rise {
+  animation: rise 0.5s ease-out 0.5s both;
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0.7); opacity: 0.45; }
+  100% { transform: scale(2); opacity: 0; }
+}
+@keyframes burst {
+  0%   { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translate(var(--x), var(--y)) scale(1) rotate(220deg); opacity: 0; }
+}
+
+.animate-ripple { animation: ripple 1.6s ease-out 0.3s 2 both; }
+.animate-burst  { animation: burst 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) 0.35s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ripple, .animate-burst { animation: none; opacity: 0; }
+}
+
+@keyframes float-up {
+  0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-90px) scale(1) rotate(180deg); opacity: 0; }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-12deg) scale(1.1); }
+  75% { transform: rotate(12deg) scale(1.1); }
+}
+
+.animate-float-up { animation: float-up 2.4s ease-out infinite; }
+.animate-wiggle   { animation: wiggle 1.2s ease-in-out 0.4s 2; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-up, .animate-wiggle { animation: none; }
+}

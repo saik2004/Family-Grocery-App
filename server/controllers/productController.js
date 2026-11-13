@@ -4,7 +4,7 @@ const Product = require("../models/product");
 // GET /api/products
 exports.getCatalog = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: 1 });
+    const products = await Product.find().sort({ createdAt: -1 });
     return res.status(200).json({ products });
   } catch (err) {
     return res.status(500).json({ message: err.message });
