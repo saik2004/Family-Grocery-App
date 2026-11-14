@@ -5,7 +5,27 @@ import { resizeToSquare } from "../utils/resizeImage";
 import ProductImage from "../Components/ProductImage";
 import AddProduct from "../Components/AddProduct";
 
-const QTY_OPTIONS = ["1/2 kg", "1 kg", "1", "2", "3", "4", "5", "6", "10"];
+const QTY_OPTIONS = [
+  // Weight
+  "250 g",
+  "500 g",
+  "750 g",
+  "1 kg",
+  "1.5 kg",
+  "2 kg",
+  "2.5 kg",
+  "3 kg",
+
+  // Liquid
+  "250 ml",
+  "500 ml",
+  "750 ml",
+  "1 liter",
+  "2 liter",
+
+  // Count (1 to 20)
+  ...Array.from({ length: 20 }, (_, i) => String(i + 1)),
+];
 
 const DRAFT_KEY = "momDraft";
 const TWO_HOURS = 2 * 60 * 60 * 1000;

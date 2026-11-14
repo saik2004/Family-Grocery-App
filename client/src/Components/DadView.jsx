@@ -39,6 +39,7 @@ export default function DadView({ onReset }) {
   const [items, setItems] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [toIgnore, setToIgnore] = useState(null); // the item being confirmed
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -62,6 +63,18 @@ export default function DadView({ onReset }) {
     try {
       const res = await api.patch(`/${id}`);
       setItems((prev) => prev.map((i) => (i._id === id ? res.data.item : i)));
+    } catch (err) {
+      setError(true);
+    }
+  };
+
+  const confirmIgnore = async () => {
+    if (!toIgnore) return;
+    const id = toIgnore._id;
+    setToIgnore(null);
+    try {
+      await api.delete(`/${id}`);
+      setItems((prev) => prev.filter((i) => i._id !== id));
     } catch (err) {
       setError(true);
     }
@@ -238,31 +251,42 @@ export default function DadView({ onReset }) {
                 <ul className="space-y-3 sm:space-y-4">
                   {pending.map((item) => (
                     <li key={item._id}>
-                      <button
-                        onClick={() => toggleItem(item._id)}
-                        className="group flex w-full items-center gap-2.5 rounded-xl border border-amber-200 border-l-4 border-l-amber-500 bg-[#FFFBEB] p-2 text-left shadow-[0_1px_2px_rgba(180,83,9,0.08)] outline-none transition-all duration-200 hover:bg-amber-50 focus-visible:ring-4 focus-visible:ring-amber-200 active:scale-[0.98] sm:gap-3 sm:p-2.5"
-                      >
-                        {/* Image */}
-                        <span className="block h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-amber-900/10 sm:h-14 sm:w-14">
-                          <ProductImage src={item.image} fill />
-                        </span>
-
-                        {/* Text */}
-                        <span className="flex min-w-0 flex-1 flex-col leading-tight">
-                          <span className="line-clamp-2 break-words text-base font-bold tracking-tight text-[#17231C] sm:text-lg">
-                            {item.nameTa}
+                      <div className="group flex w-full items-center gap-2.5 rounded-xl border border-amber-200 border-l-4 border-l-amber-500 bg-[#FFFBEB] p-2 shadow-[0_1px_2px_rgba(180,83,9,0.08)] transition-all duration-200 hover:bg-amber-50 sm:gap-3 sm:p-2.5">
+                        {/* Tap area: image + text (marks as bought) */}
+                        <button
+                          onClick={() => toggleItem(item._id)}
+                          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg text-left outline-none focus-visible:ring-4 focus-visible:ring-amber-200 active:scale-[0.98] sm:gap-3"
+                        >
+                          <span className="block h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-amber-900/10 sm:h-14 sm:w-14">
+                            <ProductImage src={item.image} fill />
                           </span>
-                          <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] font-medium text-amber-700">
-                            <span className="truncate">
-                              🕒 {formatAdded(item.addedAt)}
+
+                          <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                            {/* Tamil name */}
+                            <span className="line-clamp-2 break-words text-base font-bold tracking-tight text-[#17231C] sm:text-lg">
+                              {item.nameTa}
                             </span>
-                            {isNew(item) && (
-                              <span className="shrink-0 rounded-full bg-amber-200 px-1.5 py-px text-[9px] font-bold text-amber-900 ring-1 ring-amber-300">
-                                புதியது
+
+                            {/* English name */}
+                            {item.nameEn && item.nameEn !== item.nameTa && (
+                              <span className="mt-0.5 block truncate text-xs font-semibold text-slate-500 sm:text-sm">
+                                {item.nameEn}
                               </span>
                             )}
+
+                            {/* Meta row */}
+                            <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] font-medium text-amber-700">
+                              <span className="truncate">
+                                🕒 {formatAdded(item.addedAt)}
+                              </span>
+                              {isNew(item) && (
+                                <span className="shrink-0 rounded-full bg-amber-200 px-1.5 py-px text-[9px] font-bold text-amber-900 ring-1 ring-amber-300">
+                                  புதியது
+                                </span>
+                              )}
+                            </span>
                           </span>
-                        </span>
+                        </button>
 
                         {/* Qty */}
                         <span className="flex h-10 min-w-[48px] shrink-0 flex-col items-center justify-center rounded-lg border border-amber-200 bg-amber-100 px-1.5 leading-none">
@@ -274,14 +298,34 @@ export default function DadView({ onReset }) {
                           </span>
                         </span>
 
-                        {/* Bought tick */}
-                        <span
+                        {/* Bought */}
+                        <button
+                          onClick={() => toggleItem(item._id)}
                           aria-label="Mark as bought"
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-white text-base font-bold text-amber-800 transition-all duration-200 group-hover:border-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-active:scale-90"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-white text-base font-bold text-amber-800 outline-none transition-all duration-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-300 active:scale-90"
                         >
                           ✓
-                        </span>
-                      </button>
+                        </button>
+
+                        {/* Ignore */}
+                        <button
+                          onClick={() => setToIgnore(item)}
+                          aria-label="Ignore item"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-500 outline-none transition-all duration-200 hover:border-rose-300 hover:bg-rose-100 focus-visible:ring-2 focus-visible:ring-rose-300 active:scale-90"
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                          >
+                            <path d="M6 6l12 12M18 6L6 18" />
+                          </svg>
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -303,37 +347,45 @@ export default function DadView({ onReset }) {
                     <li key={item._id}>
                       <button
                         onClick={() => toggleItem(item._id)}
-                        className="relative flex w-full items-center gap-3 rounded-2xl border border-emerald-200 bg-[#ECFDF5] p-3.5 pr-4 text-left transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-100/70 active:scale-[0.98] sm:rounded-2xl sm:p-4"
+                        aria-label="Undo bought"
+                        className="group flex w-full items-center gap-2.5 rounded-xl border border-emerald-200 border-l-4 border-l-emerald-600 bg-[#ECFDF5] p-2 text-left shadow-[0_1px_2px_rgba(22,101,52,0.08)] outline-none transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-100/70 focus-visible:ring-4 focus-visible:ring-emerald-200 active:scale-[0.98] sm:gap-3 sm:p-2.5"
                       >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white shadow-sm ring-4 ring-emerald-100">
-                          ✓
-                        </span>
-
-                        <span className="flex min-w-0 flex-1 items-center gap-3">
-                          {/* Small fixed square image */}
-                          <span className="block h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-white opacity-80 sm:h-14 sm:w-14">
+                        {/* Image with tick badge */}
+                        <span className="relative block h-12 w-12 shrink-0 sm:h-14 sm:w-14">
+                          <span className="block h-full w-full overflow-hidden rounded-lg bg-white opacity-80 ring-1 ring-emerald-900/10">
                             <ProductImage src={item.image} fill />
                           </span>
+                          <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[11px] font-bold text-white shadow-sm ring-2 ring-[#ECFDF5]">
+                            ✓
+                          </span>
+                        </span>
 
-                          {/* Text column */}
-                          <span className="flex min-w-0 flex-1 flex-col justify-center">
-                            <span className="block truncate text-base font-semibold leading-snug text-emerald-900/60 line-through decoration-emerald-500 sm:text-lg">
-                              {item.nameTa}
+                        {/* Text column */}
+                        <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                          {/* Tamil name */}
+                          <span className="line-clamp-2 break-words text-base font-bold tracking-tight text-emerald-900/60 line-through decoration-emerald-500 sm:text-lg">
+                            {item.nameTa}
+                          </span>
+
+                          {/* English name */}
+                          {item.nameEn && item.nameEn !== item.nameTa && (
+                            <span className="mt-0.5 block truncate text-xs font-semibold text-emerald-800/70 sm:text-sm">
+                              {item.nameEn}
                             </span>
+                          )}
 
-                            <span className="block truncate text-xs text-emerald-700/70">
-                              {item.nameEn && item.nameEn !== item.nameTa
-                                ? `${item.nameEn} · `
-                                : ""}
-                              {item.quantity}
+                          {/* Meta row */}
+                          <span className="mt-1 flex min-w-0 items-center gap-1.5">
+                            <span className="shrink-0 whitespace-nowrap rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-extrabold text-emerald-800 ring-1 ring-emerald-200">
+                              × {item.quantity}
                             </span>
-
-                            <span className="mt-0.5 block text-[11px] font-medium text-emerald-700">
-                              ✓ {formatAdded(item.boughtAt)}
+                            <span className="truncate text-[11px] font-medium text-emerald-700">
+                              {formatAdded(item.boughtAt)}
                             </span>
                           </span>
                         </span>
 
+                        {/* Status pill */}
                         <span className="shrink-0 rounded-full bg-emerald-600 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm sm:text-xs">
                           Bought
                         </span>
@@ -350,6 +402,75 @@ export default function DadView({ onReset }) {
           </>
         )}
       </main>
+
+      {toIgnore && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ignore-title"
+        >
+          {/* Backdrop */}
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={() => setToIgnore(null)}
+            className="animate-fade-in absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
+          />
+
+          {/* Sheet */}
+          <div className="animate-sheet-up relative w-full max-w-md rounded-t-3xl border border-slate-200 bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_32px_-8px_rgba(15,23,42,0.3)] sm:rounded-3xl sm:pb-5">
+            <span className="mx-auto mb-4 block h-1.5 w-10 rounded-full bg-slate-200 sm:hidden" />
+
+            <div className="flex items-center gap-3">
+              <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-white ring-1 ring-slate-200 shadow-[0_1px_3px_rgba(15,23,42,0.12)]">
+                <ProductImage src={toIgnore.image} fill />
+              </span>
+              <div className="min-w-0 leading-tight">
+                <p className="truncate text-lg font-extrabold text-[#17231C]">
+                  {toIgnore.nameTa}
+                </p>
+                <p className="mt-0.5 text-xs font-semibold text-slate-500">
+                  Qty · {toIgnore.quantity}
+                </p>
+              </div>
+            </div>
+
+            <h3
+              id="ignore-title"
+              className="mt-4 text-xl font-extrabold tracking-tight text-[#17231C]"
+            >
+              இது தேவையில்லையா?
+            </h3>
+            <p className="mt-1 text-sm font-medium text-slate-500">
+              பட்டியலில் இருந்து நீக்கப்படும் · Remove from the list?
+            </p>
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setToIgnore(null)}
+                className="h-12 rounded-2xl border border-slate-300 bg-white text-base font-bold text-slate-700 outline-none transition hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-slate-200 active:scale-95"
+              >
+                வேண்டாம்
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  Keep
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={confirmIgnore}
+                className="h-12 rounded-2xl border border-rose-700 bg-gradient-to-b from-rose-500 to-rose-600 text-base font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_16px_-6px_rgba(190,18,60,0.55)] outline-none transition focus-visible:ring-4 focus-visible:ring-rose-200 active:scale-95"
+              >
+                நீக்கு
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-rose-100">
+                  Remove
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
