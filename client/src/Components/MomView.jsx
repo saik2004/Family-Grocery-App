@@ -4,6 +4,8 @@ import SentSuccess from "./SentSuccess";
 import { resizeToSquare } from "../utils/resizeImage";
 import ProductImage from "../Components/ProductImage";
 import AddProduct from "../Components/AddProduct";
+import OfflineBanner from "./OfflineBanner";
+import useOnline from "../hooks/useOnline";
 
 const QTY_OPTIONS = [
   // Weight
@@ -47,6 +49,7 @@ const loadDraft = () => {
 };
 
 export default function MomView({ onReset }) {
+  const online = useOnline();
   const [products, setProducts] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
@@ -73,7 +76,7 @@ export default function MomView({ onReset }) {
       }
     };
     fetchProducts();
-  }, [refreshKey]); // re-runs whenever refreshKey changes
+  }, [refreshKey,online]); // re-runs whenever refreshKey changes
 
   useEffect(() => {
     if (box.length === 0) {
@@ -141,41 +144,52 @@ export default function MomView({ onReset }) {
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#F8FAF7]">
       {/* Header */}
-   <header className="relative z-10 flex shrink-0 items-center justify-between gap-3 overflow-hidden border-b border-emerald-900/40 bg-gradient-to-b from-[#16803d] to-[#166534] px-4 py-3.5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(22,101,52,0.2),0_8px_20px_-6px_rgba(22,101,52,0.45)] sm:px-6 sm:py-4">
-  {/* Soft decorative glow */}
-  <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+      <header className="relative z-10 flex shrink-0 items-center justify-between gap-3 overflow-hidden border-b border-emerald-900/40 bg-gradient-to-b from-[#16803d] to-[#166534] px-4 py-3.5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(22,101,52,0.2),0_8px_20px_-6px_rgba(22,101,52,0.45)] sm:px-6 sm:py-4">
+        {/* Soft decorative glow */}
+        <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
 
-  {/* Left: avatar + title */}
-  <div className="relative flex min-w-0 items-center gap-3">
-    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] ring-1 ring-white/25 sm:h-12 sm:w-12 sm:text-2xl">
-      👩
-    </span>
+        {/* Left: avatar + title */}
+        <div className="relative flex min-w-0 items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] ring-1 ring-white/25 sm:h-12 sm:w-12 sm:text-2xl">
+            👩
+          </span>
 
-    <div className="min-w-0 leading-tight">
-      <h1 className="font-tamil truncate text-xl font-bold tracking-tight sm:text-2xl">
-        அம்மா
-      </h1>
-      <p className="font-tamil truncate text-xs font-semibold text-emerald-100/90 sm:text-sm">
-        தேவையான பொருட்களை தொடவும்
-      </p>
-    </div>
-  </div>
+          <div className="min-w-0 leading-tight">
+            <h1 className="font-tamil truncate text-xl font-bold tracking-tight sm:text-2xl">
+              அம்மா
+            </h1>
+            <p className="font-tamil truncate text-xs font-semibold text-emerald-100/90 sm:text-sm">
+              தேவையான பொருட்களை தொடவும்
+            </p>
+          </div>
+        </div>
 
-  {/* Right: switch role */}
-  <button
-    onClick={onReset}
-    aria-label="Change role"
-    className="font-tamil relative flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3.5 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_2px_rgba(0,0,0,0.15)] outline-none backdrop-blur transition hover:border-white/50 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-emerald-200 active:scale-95"
-  >
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13" />
-    </svg>
-    <span>மாற்று</span>
-    <span className="hidden text-xs font-medium text-emerald-100/80 min-[400px]:inline">
-      Change
-    </span>
-  </button>
-</header>
+        {/* Right: switch role */}
+        <button
+          onClick={onReset}
+          aria-label="Change role"
+          className="font-tamil relative flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3.5 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_2px_rgba(0,0,0,0.15)] outline-none backdrop-blur transition hover:border-white/50 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-emerald-200 active:scale-95"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13" />
+          </svg>
+          <span>மாற்று</span>
+          <span className="hidden text-xs font-medium text-emerald-100/80 min-[400px]:inline">
+            Change
+          </span>
+        </button>
+      </header>
+
+      <OfflineBanner />
 
       {/* Main Content */}
       <main className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden px-3 pt-4 sm:px-5">
@@ -472,43 +486,61 @@ export default function MomView({ onReset }) {
         )}
 
         <button
-  onClick={sendToDad}
-  disabled={box.length === 0 || sending}
-  className="group relative mx-auto flex h-14 w-full max-w-3xl items-center justify-between gap-3 overflow-hidden rounded-2xl border border-[#14532D] bg-gradient-to-b from-[#16803d] to-[#166534] pl-5 pr-2 text-base font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_1px_2px_rgba(6,78,59,0.3),0_8px_18px_-6px_rgba(6,78,59,0.55)] outline-none transition-all duration-200 hover:from-[#15803d] hover:to-[#14532D] focus-visible:ring-4 focus-visible:ring-emerald-200 active:scale-[0.98] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-none disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none sm:h-16 sm:text-lg"
->
-  <span className="truncate">
-    {sending ? "அனுப்புகிறது..." : "அப்பாவுக்கு அனுப்பு"}
-  </span>
+          onClick={sendToDad}
+          disabled={box.length === 0 || sending || !online}
+          className="group relative mx-auto flex h-14 w-full max-w-3xl items-center justify-between gap-3 overflow-hidden rounded-2xl border border-[#14532D] bg-gradient-to-b from-[#16803d] to-[#166534] pl-5 pr-2 text-base font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_1px_2px_rgba(6,78,59,0.3),0_8px_18px_-6px_rgba(6,78,59,0.55)] outline-none transition-all duration-200 hover:from-[#15803d] hover:to-[#14532D] focus-visible:ring-4 focus-visible:ring-emerald-200 active:scale-[0.98] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-none disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none sm:h-16 sm:text-lg"
+        >
+          <span className="truncate">
+            {sending ? "அனுப்புகிறது..." : !online ? "இணையம் இல்லை" : "அப்பாவுக்கு அனுப்பு"}
+          </span>
 
-  <span className="flex shrink-0 items-center gap-2">
-    {!sending && (
-      <span
-        className={`flex h-9 min-w-9 items-center justify-center rounded-xl px-2 text-sm font-extrabold ${
-          box.length === 0
-            ? "bg-slate-300/60 text-slate-500"
-            : "bg-white/20 text-white ring-1 ring-white/30"
-        }`}
-      >
-        {box.length}
-      </span>
-    )}
-    <span
-      className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/20 transition-transform duration-200 ${
-        box.length > 0 && !sending ? "group-hover:translate-x-0.5" : ""
-      }`}
-    >
-      {sending ? (
-        <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-          <path d="M12 3a9 9 0 1 0 9 9" />
-        </svg>
-      ) : (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      )}
-    </span>
-  </span>
-</button>
+          <span className="flex shrink-0 items-center gap-2">
+            {!sending && (
+              <span
+                className={`flex h-9 min-w-9 items-center justify-center rounded-xl px-2 text-sm font-extrabold ${
+                  box.length === 0
+                    ? "bg-slate-300/60 text-slate-500"
+                    : "bg-white/20 text-white ring-1 ring-white/30"
+                }`}
+              >
+                {box.length}
+              </span>
+            )}
+            <span
+              className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/20 transition-transform duration-200 ${
+                box.length > 0 && !sending ? "group-hover:translate-x-0.5" : ""
+              }`}
+            >
+              {sending ? (
+                <svg
+                  className="animate-spin"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                >
+                  <path d="M12 3a9 9 0 1 0 9 9" />
+                </svg>
+              ) : (
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              )}
+            </span>
+          </span>
+        </button>
       </div>
     </div>
   );

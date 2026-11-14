@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import api from "../api";
 import ProductImage from "../Components/ProductImage";
+import OfflineBanner from "./OfflineBanner";
+import useOnline from "../hooks/useOnline";
 
 const SPARKS = [
   { l: "12%", d: "0s", c: "bg-amber-400" },
@@ -36,6 +38,7 @@ const formatAdded = (dateString) => {
 };
 
 export default function DadView({ onReset }) {
+  const online = useOnline();
   const [items, setItems] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -57,7 +60,7 @@ export default function DadView({ onReset }) {
     fetchItems();
     const timer = setInterval(fetchItems, 8000);
     return () => clearInterval(timer);
-  }, []);
+  }, [online]);
 
   const toggleItem = async (id) => {
     try {
@@ -164,9 +167,11 @@ export default function DadView({ onReset }) {
         )}
       </header>
 
+      <OfflineBanner />
+
       {/* Connection error */}
-      {error && (
-        <div className="border-b border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600">
+      {error && online && (
+        <div className="bg-red-500 px-4 py-2 text-center text-sm font-medium text-white">
           இணைப்பு இல்லை (Can't reach server)
         </div>
       )}
