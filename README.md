@@ -44,8 +44,8 @@ Mom would remember items only after Dad had left for the shop or for work. That 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/saik2004/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/saik2004/Family-Grocery-App.git
+cd <Family-Grocery-App>
 ```
 
 ### 2. Set up MongoDB Atlas (your own database)
