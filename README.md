@@ -1,5 +1,7 @@
 # 🛒 Family Grocery App
 
+
+
 A simple full-stack app that stopped my parents from arguing over forgotten groceries.
 
 Mom adds products whenever she remembers, Dad sees the list on his way home, and nobody gets interrupted at work.
@@ -7,6 +9,9 @@ Mom adds products whenever she remembers, Dad sees the list on his way home, and
 ## The Problem
 
 Mom would remember items only after Dad had left for the shop or for work. That meant repeated phone calls during his job, missed items, and arguments at home. This app replaces those calls with a shared list.
+
+<img width="1280" height="720" alt="GrocerryApp" src="https://github.com/user-attachments/assets/926200c0-0976-4251-b3b6-dbed65ff0340" />
+
 
 ## How It Works
 
